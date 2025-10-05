@@ -1,0 +1,65 @@
+// //used for commenting
+function //a block of code that can be repeated inside a program
+output //the resulting piece of something from a program
+compiler // piece of software that "compile" your source code into object file
+error // something that wrong or the program arent supposed to do maybe a logic error, compile error , run-time error or link-time error
+linker // program that link object code and produce executable
+executable //ready to run object code because the resulting machien code is complete and doesnt need any dependencies anymore
+object code // machine code results from source code
+comment // piece of textx that the compiler doesnt see and compile and its for human eye
+import // code for including a module
+library // source code that has many definitions and declaration of functions, macro , variable and/or structures
+module //same with library's header file but with also the implementation details
+main() // a function that the program starts from
+C++ // an exmaple of language that use for writing source code
+IDE // software that eases and speeds up development of code
+source code // human-readable file that can be turned into machine code
+statement //
+#include // a directive that will expand into a header file ,essentially making the file appear at that point and thus making the definitions,declaration etc be available
+<< // an operator that print the right hand into the left hand stream
+header file // file for storing declaration definitions and etc but not the implementation details
+program // 
+compile-time // a time interval where the programs compiling(or rather being compiled)
+cout // the output streams for output of C++
+std // standard library for C++ that contains many functions , macro , data structure etc
+command line // a terminal in software that mimic older physical terminal in the early days of computer 
+bug // error of a program whether its logic error , compile-time error or the other
+debugging // process of which to find and fix bug whether by checking the source code or using tools like GDB for helping the debuggin process (maybe see the resulting assembly or something)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
