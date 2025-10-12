@@ -4,7 +4,7 @@
 // "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
 //
 
-#include "../std_lib_facilities.h"
+#include "std_lib_facilities.h"
 
 /*
     Simple calculator
@@ -134,12 +134,15 @@ Token Token_stream::get() // read characters from cin and compose a Token
     case print:
     case '(':
     case ')':
+    case '{':
+    case '}':
     case '+':
     case '-':
     case '*':
     case '/': 
     case '%':
     case '=':
+    case '!':
         return Token(ch); // let each character represent itself
     case '.':             // a floating-point literal can start with a dot
     case '0': case '1': case '2': case '3': case '4':
@@ -154,7 +157,7 @@ Token Token_stream::get() // read characters from cin and compose a Token
         if (isalpha(ch)) {
             string s;
             s += ch;
-            while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s+=ch;
+            while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch =='_')) s+=ch;
             cin.putback(ch);
             if (s == declkey) return Token(let); // keyword "let"
             return Token(name,s);
@@ -199,6 +202,23 @@ public:
 vector<Variable> var_table;
 
 //------------------------------------------------------------------------------
+
+int fact(int n) {
+
+
+   if(n == 0 || n == 1){
+
+     return 1;
+
+   }
+    
+   return n * fact(n - 1);
+
+
+}
+
+//------------------------------------------------------------------------------
+
 
 double get_value(string s)
     // return the value of the Variable names s
@@ -253,10 +273,19 @@ double primary()
     Token t = ts.get();
     switch (t.kind) {
     case '(':           // handle '(' expression ')'
+    
         {
             double d = expression();
             t = ts.get();
             if (t.kind != ')') error("')' expected");
+            return d;
+        }
+    case '{':
+    
+        {
+            double d = expression();
+            t = ts.get();
+            if (t.kind != '}') error("'}' expected");
             return d;
         }
     case number:    
@@ -273,22 +302,44 @@ double primary()
 }
 
 //------------------------------------------------------------------------------
-
-// deal with *, /, and %
-double term()
-{
+// deal with !
+double high_order() {
     double left = primary();
     Token t = ts.get(); // get the next token from token stream
 
     while(true) {
         switch (t.kind) {
+        case '!':
+            
+            left = (int) left; 
+            left = fact(left);
+            t = ts.get();
+            break;
+        
+        default: 
+            ts.putback(t);        // put t back into the token stream
+            return left;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+ 
+// deal with *, /, and %
+double term()
+{
+    double left = high_order();
+    Token t = ts.get(); // get the next token from token stream
+
+    while(true) {
+        switch (t.kind) {
         case '*':
-            left *= primary();
+            left *= high_order();
             t = ts.get();
             break;
         case '/':
             {    
-                double d = primary();
+                double d = high_order();
                 if (d == 0) error("divide by zero");
                 left /= d; 
                 t = ts.get();
@@ -308,7 +359,11 @@ double term()
             return left;
         }
     }
+
 }
+
+
+
 
 //------------------------------------------------------------------------------
 
