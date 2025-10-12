@@ -200,75 +200,192 @@ int main(){
 */
 
  void input_1_digit(int* digit);
- constexpr int size = 4;
+ vector<int> bull_cow_count(vector<int> guess , vector<int> answer);
+
+
+
+
+ 
   
   
- vector<int> digits = {0,1,2,3,4
-                      ,5,6,7,8,9};
-  
+ 
  vector<int> answer;
+ vector<int> user_guess;
+ vector<int> result;
  
- vector<int> user_answer;
-  
+ 
+ 
  int user_digit;
-
+ int size = 4;
  
  
  
+ do{
  
  
- for(int i = 1 ; i <= size ; ++i){
+   bool isCorrect = false;
+ 
+   vector<int> digits = {0,1,2,3,4
+                        ,5,6,7,8,9};
+   //generate the answer
+ 
+   for(int i = 1 ; i <= size ; ++i){
    
    
-   default_random_engine rng(random_device{}()); //seed
+     default_random_engine rng(random_device{}()); //seed
    
    
-   uniform_int_distribution<int> dist(0 , digits.size() - 1);
+     uniform_int_distribution<int> dist(0 , digits.size() - 1);
    
-   int randomIndex = dist(rng);
+     int randomIndex = dist(rng);
    
-   answer.push_back(digits[randomIndex]);
-   digits.erase(digits.begin() + randomIndex);
+     answer.push_back(digits[randomIndex]);
+     digits.erase(digits.begin() + randomIndex);
    
- }
+   }
   
 
 
- 
-
-
- for(int i = 1 ; i <= size ; ++i){
+   //prompting the user until user got it right
+   
+   do{
+      
+      
+     // prompt the user to guess
+     for(int i = 1 ; i <= size ; ++i){
   
-   cout << i << ": \n";
+       cout << i << ": \n";
+    
+       input_1_digit(&user_digit);
    
-   input_1_digit(&user_digit);
-   
-   user_answer.push_back(user_digit);
+       user_guess.push_back(user_digit);
   
- }
+     }
 
- cout << '\n';
+
+   
+
+     // display the answer and also user guess
+     cout << "\nanswer: ";
  
- for(const auto& x : user_answer){
+     for(int i = 0 ; i < size ; ++i){
    
-     cout << x;
+         cout << answer[i];
    
    
- }
+     }
  
- cout << '\n';
+     cout << "\nguess : ";
+
+     for(int i = 0 ; i < size ; ++i){
+   
+         cout << user_guess[i];
+   
+   
+     }
+ 
+     result = bull_cow_count(user_guess , answer);
+   
+     try{
+     cout << "\n\nbull: " << result[0] << "\ncow: " << result[1] << '\n';
+
+     }catch(...){
+   
+        cout << "invalid\n";
+   
+     }
+     
+     if(result[0] == size){
+       
+       isCorrect = true;
+     }
+     
+     
+     user_guess.clear();
+     
+     
+     
+     
+   }while(!isCorrect);
+
+   answer.clear();
+
+   user_guess.clear();
+   
+   result.clear();
+   
+   
+ }while(true);
+ 
+ 
+ 
+}
 
 
 
-
-
-
-
+void input_1_digit(int* digit){
+  
+  
+  
+  do{
+  
+  
+     cin >> (*digit);
+  
+  }while( *digit < 0 || *digit > 9);
   
 }
 
 
 
+
+
+
+vector<int> bull_cow_count(vector<int> guess , vector<int> answer){
+  
+  int size = 4;
+  
+  vector<int> bull_cow = {0,0};
+  
+  
+  
+  if(guess.size() < size || answer.size() < size){
+    
+    throw runtime_error("invalid guess or answer\n");
+    
+  }
+  
+  
+  
+  
+  
+  
+  for(int i = 0 ; i < size ; ++i){
+    for(int j = 0 ; j < size ; ++j){
+    
+      if(guess[i] == answer[j]){
+      
+         if(i == j){
+        
+            ++(bull_cow[0]);
+            continue;
+         
+         }
+      
+      ++(bull_cow[1]);
+      
+      }
+      
+    }
+    
+    
+    
+  }
+  
+  
+  return bull_cow;
+  
+}
 
 
 
@@ -348,21 +465,6 @@ int nth_fibbonaci(int n){
   return nth_fibbonaci(n-1) + nth_fibbonaci(n-2);
   
   
-  
-}
-
-
-
-void input_1_digit(int* digit){
-  
-  
-  
-  do{
-  
-  
-     cin >> (*digit);
-  
-  }while( *digit < 0 || *digit > 9);
   
 }
 
