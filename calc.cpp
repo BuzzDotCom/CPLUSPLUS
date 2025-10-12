@@ -1,10 +1,10 @@
 
 //
-// This is example code from Chapter 7.7 "Recovering from errors" of
+// This is example code from Chapter 7.8.3 "Predefined names" of
 // "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
 //
 
-#include "std_lib_facilities.h"
+#include "../std_lib_facilities.h"
 
 /*
     Simple calculator
@@ -22,10 +22,18 @@
 
     The grammar for input is:
 
-    Statement:
-        Expression
+    Calculation:
+        Statement
         Print
         Quit
+        Calculation Statement
+    
+    Statement:
+        Declaration
+        Expression
+    
+    Declaration:
+        "let" Name "=" Expression
 
     Print:
         ;
@@ -44,6 +52,7 @@
         Term % Primary
     Primary:
         Number
+        Name
         ( Expression )
         - Primary
         + Primary
@@ -59,8 +68,11 @@
 const char number = '8';    // t.kind==number means that t is a number Token
 const char quit   = 'q';    // t.kind==quit means that t is a quit Token
 const char print  = ';';    // t.kind==print means that t is a print Token
-const string prompt = "> ";
-const string result = "= "; // used to indicate that what follows is a result
+const char name   = 'a';    // name token
+const char let    = 'L';    // declaration token
+const string declkey = "let";// declaration keyword 
+const string prompt  = "> ";
+const string result  = "= "; // used to indicate that what follows is a result
 
 //------------------------------------------------------------------------------
 
@@ -68,10 +80,10 @@ class Token {
 public:
     char kind;        // what kind of token
     double value;     // for numbers: a value 
-    Token(char ch)    // make a Token from a char
-        :kind(ch), value(0) { }    
-    Token(char ch, double val)     // make a Token from a char and a double
-        :kind(ch), value(val) { }
+    string name;      // for names: name itself
+    Token(char ch)             : kind(ch), value(0)   {}
+    Token(char ch, double val) : kind(ch), value(val) {}
+    Token(char ch, string n)   : kind(ch), name(n)    {}
 };
 
 //------------------------------------------------------------------------------
@@ -127,6 +139,7 @@ Token Token_stream::get() // read characters from cin and compose a Token
     case '*':
     case '/': 
     case '%':
+    case '=':
         return Token(ch); // let each character represent itself
     case '.':             // a floating-point literal can start with a dot
     case '0': case '1': case '2': case '3': case '4':
@@ -138,6 +151,14 @@ Token Token_stream::get() // read characters from cin and compose a Token
         return Token(number,val);
     }
     default:
+        if (isalpha(ch)) {
+            string s;
+            s += ch;
+            while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s+=ch;
+            cin.putback(ch);
+            if (s == declkey) return Token(let); // keyword "let"
+            return Token(name,s);
+        }
         error("Bad token");
     }
 }
@@ -154,7 +175,7 @@ void Token_stream::ignore(char c)
     }
     full = false;
 
-    // now seach input:
+    // now search input:
     char ch = 0;
     while (cin>>ch)
         if (ch==c) return;
@@ -163,6 +184,62 @@ void Token_stream::ignore(char c)
 //------------------------------------------------------------------------------
 
 Token_stream ts;        // provides get() and putback() 
+
+//------------------------------------------------------------------------------
+
+class Variable {
+public:
+    string name;
+    double value;
+    Variable (string n, double v) :name(n), value(v) { }
+};
+
+//------------------------------------------------------------------------------
+
+vector<Variable> var_table;
+
+//------------------------------------------------------------------------------
+
+double get_value(string s)
+    // return the value of the Variable names s
+{
+    for (int i = 0; i<var_table.size(); ++i)
+        if (var_table[i].name == s) return var_table[i].value;
+    error("get: undefined variable ", s);
+}
+
+//------------------------------------------------------------------------------
+
+void set_value(string s, double d)
+    // set the Variable named s to d
+{
+    for (int i = 0; i<var_table.size(); ++i)
+        if (var_table[i].name == s) {
+            var_table[i].value = d;
+            return;
+        }
+    error("set: undefined variable ", s);
+}
+
+//------------------------------------------------------------------------------
+
+bool is_declared(string var)
+    // is var already in var_table?
+{
+    for (int i = 0; i<var_table.size(); ++i)
+        if (var_table[i].name == var) return true;
+    return false;
+}
+
+//------------------------------------------------------------------------------
+
+double define_name(string var, double val)
+    // add (var,val) to var_table
+{
+    if (is_declared(var)) error(var," declared twice");
+    var_table.push_back(Variable(var,val));
+    return val;
+}
 
 //------------------------------------------------------------------------------
 
@@ -184,6 +261,8 @@ double primary()
         }
     case number:    
         return t.value;    // return the number's value
+    case name:
+        return get_value(t.name); // return the variable's value
     case '-':
         return - primary();
     case '+':
@@ -258,6 +337,38 @@ double expression()
 
 //------------------------------------------------------------------------------
 
+double declaration()
+    // handle: name = expression
+    // declare a variable called "name" with the initial value "expression"
+{
+    Token t = ts.get();
+    if (t.kind != name) error ("name expected in declaration");
+    string var_name = t.name;
+
+    Token t2 = ts.get();
+    if (t2.kind != '=') error("= missing in declaration of ", var_name);
+
+    double d = expression();
+    define_name(var_name,d);
+    return d;
+}
+
+//------------------------------------------------------------------------------
+
+double statement()
+{
+    Token t = ts.get();
+    switch (t.kind) {
+    case let:
+        return declaration();
+    default:
+        ts.putback(t);
+        return expression();
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void clean_up_mess()
 { 
     ts.ignore(print);
@@ -274,7 +385,7 @@ void calculate()
         while (t.kind == print) t=ts.get();    // first discard all "prints"
         if (t.kind == quit) return;        // quit
         ts.putback(t);
-        cout << result << expression() << endl;
+        cout << result << statement() << endl;
     }
     catch (exception& e) {
         cerr << e.what() << endl;        // write error message
@@ -286,11 +397,16 @@ void calculate()
 
 int main()
 try {
+    // predefine names:
+    define_name("pi",3.1415926535);
+    define_name("e",2.7182818284);
+
     calculate();
+
     keep_window_open();    // cope with Windows console mode
     return 0;
 }
-catch (runtime_error& e) {
+catch (exception& e) {
     cerr << e.what() << endl;
     keep_window_open("~~");
     return 1;
