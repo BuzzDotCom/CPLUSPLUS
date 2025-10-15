@@ -302,6 +302,7 @@ double primary()
 }
 
 //------------------------------------------------------------------------------
+
 // deal with !
 double high_order() {
     double left = primary();
