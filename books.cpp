@@ -53,6 +53,9 @@ class Book{
      Book (string book , int page_)                    : book_name(book) , page(page_) , marked(false)   { }
      Book (string book , int page_ , bool marked_)     : book_name(book) , page(page_) , marked(marked_) { }
 
+
+     friend ostream& operator<<(ostream& os , const Book& book);
+
   private:
 
     string book_name;
@@ -65,6 +68,14 @@ class Book{
 
 };
 
+ostream& operator<<(ostream& os , const Book& book){
+
+    os << "\"" << book.book_name << "\"" << endl 
+       << "Page: " << book.page;
+    return os;
+
+
+}
 
 
 
@@ -131,8 +142,8 @@ class BookRack{
             void list_bookmarks();
             
             void add_book(Book book);
-            void update_book(string book_name);
-            void remove_book(string book_name);
+            void update_book();
+            void remove_book();
 
 
     private:
@@ -218,7 +229,7 @@ void BookRack::save_books(string file_name){
 
         for(Book& book : book_container ){
 
-                output_file << book.get_name() << book.get_page() << book.bookmarked() << endl;
+                output_file << book.get_name() << ' ' << book.get_page() << ' ' << book.bookmarked() << endl;
 
 
 
@@ -243,10 +254,11 @@ void BookRack::save_books(string file_name){
 
 void BookRack::list_books(){
 
+        int entry = 1;
         for(Book& book : book_container){
 
-                cout << book.get_name() << " " << book.get_page() << " " << book.bookmarked() << "\n";
-
+                cout << entry << ". " <<  book << "\n";
+                ++entry;
 
 
         }
@@ -279,43 +291,61 @@ void BookRack::mark_book(string book_name , bool marked){
 
 void BookRack::list_bookmarks(){
 
+      int entry = 1;
+      for(Book book : book_container){
+            if(book.bookmarked()){
 
-
-
-
-
+                cout << entry << ". " <<  book << "\n";
+                ++entry;
+            }
+      }
 }
 
 
 
 
-void BookRack::add_book(Book book){
+void BookRack::add_book(Book new_){
+
+     for(Book book : book_container){
+            if(new_.get_name() == book.get_name()){
+                  return;
+            }
+     }
+     book_container.push_back(new_);
+}
 
 
+
+void BookRack::update_book(){
+
+    int entry = 0;
+    int page = 0;
+
+     cout << "Enter book number: "; cin >> entry;
      
+     if(entry < 1 || entry > book_count){
+           return;
+     }
 
-
+     cout << "Update \"" << book_container[entry - 1].get_name() << "\" to page: "; cin >>  page;
+     book_container[entry - 1].set_page(page);
 
 }
 
 
 
-void BookRack::update_book(string book_name){
+void BookRack::remove_book(){
 
 
+     int entry = 0;
+     cout << "Enter book number to ne removed: "; cin >> entry;
+
+     if(entry < 1 || entry  > book_count){
+              return;
+     }
      
 
-
-
-}
-
-
-
-void BookRack::remove_book(string book_name){
-
-
-     
-
+     book_container.erase(book_container.begin() + entry - 1);
 
 
 }
@@ -352,10 +382,23 @@ int main(){
 
     
     rack.load_books("books.txt");
+
+    rack.add_book(Book("tesfdst" , 24214214 , 1));
      
     rack.list_books();
 
+    cout << "\n\n";
+    rack.list_bookmarks();
 
+    rack.update_book();
+    rack.remove_book();
+
+    cout << "\n\n";
+    
+    
+    rack.list_books();
+    
+    
     rack.save_books("books.txt");
 
 
