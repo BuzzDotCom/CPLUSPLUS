@@ -338,7 +338,7 @@ void BookRack::remove_book(){
 
 
      int entry = 0;
-     cout << "Enter book number to ne removed: "; cin >> entry;
+     cout << "Enter book number to be removed: "; cin >> entry;
 
      if(entry < 1 || entry  > book_count){
               return;
@@ -363,28 +363,28 @@ void BookRack::remove_book(){
 
 
 int main(){
+  
+  
+  
 
     BookRack rack;
-    
+    rack.load_books("books.txt");
 
     rack.set_max(500);
 
 
     
     
-    Book books("a" , 1 ,true);
+    Book book2("second book" , 10 ,true);
 
-    books.set_page(100);
-
-    cout << books.get_page() << endl;
-    cout << books.bookmarked() << endl;
-
+    book2.set_page(100);
 
     
-    rack.load_books("books.txt");
+    
+    
 
-    rack.add_book(Book("tesfdst" , 24214214 , 1));
-     
+    rack.add_book(Book("a book name" , 200 , 1));
+    rack.add_book(book2);
     rack.list_books();
 
     cout << "\n\n";
