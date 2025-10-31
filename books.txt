@@ -1,3 +1,4 @@
-halo1 421421 0
+halo1 100 0
 halo2 234232222 1
-halo3 24214214 1
+halo3 10000 1
+second_book 100 1

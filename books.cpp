@@ -33,7 +33,9 @@ void concat(string result , string string1 , string string2){
 
 }
 
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 
 
@@ -45,6 +47,7 @@ class Book{
 
      int get_page();
      void set_page(int p);
+     
 
      void set_mark(bool flag);
      bool bookmarked();
@@ -53,7 +56,7 @@ class Book{
      Book (string book , int page_)                    : book_name(book) , page(page_) , marked(false)   { }
      Book (string book , int page_ , bool marked_)     : book_name(book) , page(page_) , marked(marked_) { }
 
-
+     friend istream& operator>>(istream& is , Book& book);
      friend ostream& operator<<(ostream& os , const Book& book);
 
   private:
@@ -67,6 +70,15 @@ class Book{
 
 
 };
+
+
+istream& operator>>(istream& is , Book& book){
+
+    
+    is >> book.book_name >> book.page >> book.marked;
+    return is;
+}
+
 
 ostream& operator<<(ostream& os , const Book& book){
 
@@ -124,6 +136,9 @@ bool Book::bookmarked(){
 
 }
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 class BookRack{
 
@@ -138,10 +153,10 @@ class BookRack{
             void save_books(string file_name);
             void list_books();
 
-            void mark_book(string book_name , bool marked);
+            void mark_unmark(string book_name);
             void list_bookmarks();
             
-            void add_book(Book book);
+            void add_book(string book_name);
             void update_book();
             void remove_book();
 
@@ -188,30 +203,12 @@ void BookRack::load_books(string file_name){
 
         }
 
-        string name;
-        int page;
-        bool marked;
-        
-
-        while(input_file >> name >> page >> marked){
-
-             book_container.push_back(Book(name,page,marked));
-
-
+        Book book("");
+        while(input_file >> book){
+             book_container.push_back(book);
              ++book_count;
-             
-
-
-
         }
-
-
-
-
-
-
         input_file.close();
-
 }
 
 
@@ -271,14 +268,14 @@ void BookRack::list_books(){
 
 
 
-void BookRack::mark_book(string book_name , bool marked){
+void BookRack::mark_unmark(string book_name){
 
 
      for(Book& book : book_container){
 
         if(book_name == book.get_name()){
 
-            book.set_mark(marked) ;
+            book.set_mark(!(book.bookmarked()) );
 
         }
 
@@ -304,14 +301,14 @@ void BookRack::list_bookmarks(){
 
 
 
-void BookRack::add_book(Book new_){
+void BookRack::add_book(string book_name){
 
      for(Book book : book_container){
-            if(new_.get_name() == book.get_name()){
+            if(book_name == book.get_name()){
                   return;
             }
      }
-     book_container.push_back(new_);
+     book_container.emplace_back(Book(book_name));
 }
 
 
@@ -338,23 +335,23 @@ void BookRack::remove_book(){
 
 
      int entry = 0;
+     string temp;
      cout << "Enter book number to be removed: "; cin >> entry;
 
      if(entry < 1 || entry  > book_count){
               return;
      }
      
-
+     temp = book_container[entry - 1].get_name();
      book_container.erase(book_container.begin() + entry - 1);
 
-
+     
+     cout << "\"" << temp << "\" removed";
 }
 
 
-
-
-
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 
 
@@ -369,26 +366,20 @@ int main(){
 
     BookRack rack;
     rack.load_books("books.txt");
-
     rack.set_max(500);
-
-
-    
-    
-    Book book2("second book" , 10 ,true);
-
-    book2.set_page(100);
-
-    
-    
     
 
-    rack.add_book(Book("a book name" , 200 , 1));
-    rack.add_book(book2);
+
+    rack.add_book("a_book_name");
+    
+    rack.add_book("second_book" );
+
+
+
     rack.list_books();
-
     cout << "\n\n";
     rack.list_bookmarks();
+
 
     rack.update_book();
     rack.remove_book();
@@ -398,12 +389,15 @@ int main(){
     
     rack.list_books();
     
+
+
+
+
+
+
+
+
     
     rack.save_books("books.txt");
-
-
-
-   return 0;
-
-
+    return 0;
 }
