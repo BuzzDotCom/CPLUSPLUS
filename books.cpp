@@ -361,43 +361,70 @@ void BookRack::remove_book(){
 
 int main(){
   
-  
-  
-
+    
     BookRack rack;
-    rack.load_books("books.txt");
-    rack.set_max(500);
+    void getBuffered();
+ 
+    char choice = '0';
+   
+    while(true){
+    
+        cout << "\x1b[H\x1b[2J";
+        cout << "\nMenu:\n";
+        cout << "b. Books list\n";
+        cout << "m. Bookmarks list\n";
+        cout << "a. Add a book\n";
+        cout << "u. Update a book\n";
+        cout << "r. Remove a book\n";
+        cout << "x. Exit\n";
+        cout << "\nEnter menu choice: "; cin >> choice; cout << '\n';
+        
+        switch(choice){
+
+            case 'b':
+                
+
+
+
+
+
+
+
+
+        }
+
+
+
+        
+        rack.load_books("books.txt");
+        rack.set_max(500);
     
 
 
-    rack.add_book("a_book_name");
+        rack.add_book("a_book_name");
     
-    rack.add_book("second_book" );
+        rack.add_book("second_book" );
 
 
 
-    rack.list_books();
-    cout << "\n\n";
-    rack.list_bookmarks();
+        rack.list_books();
+        cout << "\n\n";
+        rack.list_bookmarks();
 
 
-    rack.update_book();
-    rack.remove_book();
+        rack.update_book();
+        rack.remove_book();
 
-    cout << "\n\n";
-    
-    
-    rack.list_books();
-    
-
-
-
-
-
+        cout << "\n\n";
+        
+        
+        rack.list_books();
+        
 
 
 
     
-    rack.save_books("books.txt");
+        rack.save_books("books.txt");
+    }
     return 0;
 }
