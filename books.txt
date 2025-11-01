@@ -1,4 +1,19 @@
-halo1 100 0
-halo2 234232222 1
-halo3 10000 1
-second_book 100 1
+Hardware Komputer	0 0
+How Linux works	0 0
+Programming in C	0 0
+A tour of C++	0 0
+Aplikasi Internet menggunakan HTML, CSS & JavaScript	0 0
+Programming, Principles and Practice using C++	680 1 
+Desain Digital & Arsitektur Komputer	600 1
+Computer Networks	0 0 
+Introduction to Algorithms	0 0 
+The Algorithm Design Manual	0 0 
+Data Structures And Program Design in C++	0 0
+Algoritma Dan Pemrograman Dalam Bahasa Pascal, C, Dan C++	460 1
+
+
+
+
+
+
+

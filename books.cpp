@@ -6,33 +6,6 @@
 
 using namespace std;
 
-int compare_string(string string1 , string string2);
-void concat(string result , string string1 , string string2);
-
-int compare_string(string string1 , string string2){
-
-
-    return 0;
-}
-
-
-
-
-
-void concat(string result , string string1 , string string2){
-
-
-
-
-
-
-
-
-
-
-
-}
-
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -361,9 +334,12 @@ void BookRack::remove_book(){
 
 int main(){
   
+    void getBuffered();
+    
     
     BookRack rack;
-    void getBuffered();
+    rack.load_books("books.txt");
+    rack.set_max(500);
  
     char choice = '0';
    
@@ -371,60 +347,127 @@ int main(){
     
         cout << "\x1b[H\x1b[2J";
         cout << "\nMenu:\n";
-        cout << "b. Books list\n";
-        cout << "m. Bookmarks list\n";
-        cout << "a. Add a book\n";
-        cout << "u. Update a book\n";
-        cout << "r. Remove a book\n";
-        cout << "x. Exit\n";
+        
+        
+        cout << "f. Fill Daily Reading Target\n";
+        cout << "l. Bookmarks List\n";
+        cout << "x. Mark or Unmark A Book\n";
+        cout << "b. Books List\n";
+        cout << "a. Add A Book\n";
+        cout << "u. Update A Book\n";
+        cout << "r. Remove A Book\n";
+        cout << "q. Quit\n";
+        
+        
         cout << "\nEnter menu choice: "; cin >> choice; cout << '\n';
         
         switch(choice){
-
-            case 'b':
-                
-
-
-
-
-
-
-
-
+            
+            
+            case 'f' :
+            
+            {
+              
+               rack.list_bookmarks();
+              
+               rack.save_books("books.txt");
+               
+               rack.list_bookmarks();
+               break;
+              
+            }
+            
+            
+            
+            case 'l' :
+            {
+               rack.list_bookmarks();
+               break;
+              
+            }
+            
+            
+            case 'x' :
+            {
+               
+               string book_name;
+              
+              
+               rack.list_books();
+               
+               cout << "Enter book to change: "; cin >> book_name;
+               
+               rack.mark_unmark(book_name);
+               
+               rack.save_books("books.txt");
+               
+               rack.list_bookmarks();
+               break;
+              
+            }
+            
+            
+            case 'b' :
+            {
+               rack.list_books();
+               break;
+              
+            }
+            
+            
+            case 'a' :
+            {
+               string book_name
+               
+               rack.list_books();
+               
+               cout << "Enter the name of the book you want to add: "; cin >> book_name;
+               rack.add_book(book_name);
+               rack.save_books("books.txt");
+               
+               rack.list_books();
+              
+            }
+            
+            
+            case 'u' :
+            {
+                 rack.list_books();
+                 rack.update_book();
+                 rack.save_books("books.txt");
+                 rack.list_books();
+                 break;
+              
+              
+            }
+            
+            
+            case 'r' :
+            {
+                 rack.list_books();
+                 rack.remove_book();
+                 rack.save_books("books.txt");
+                 rack.list_books();
+                 break;
+              
+            }
+            
+            
+            case 'q' :
+            {
+              
+                 return 0;
+              
+            }
+            
+            default:
+            
+            cout << "\ninvalid choice. please try again!\n";
+              
         }
-
-
-
         
-        rack.load_books("books.txt");
-        rack.set_max(500);
-    
-
-
-        rack.add_book("a_book_name");
-    
-        rack.add_book("second_book" );
-
-
-
-        rack.list_books();
-        cout << "\n\n";
-        rack.list_bookmarks();
-
-
-        rack.update_book();
-        rack.remove_book();
-
-        cout << "\n\n";
-        
-        
-        rack.list_books();
-        
-
-
-
-    
-        rack.save_books("books.txt");
     }
+    
     return 0;
+    
 }
