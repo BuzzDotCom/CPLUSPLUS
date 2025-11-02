@@ -16,18 +16,19 @@ class Book{
 
   public:
 
-     const string& get_name() const;
+     string& get_name() ;
 
-     int get_page();
+     const int& get_page() const;
      void set_page(int p);
      
 
      void set_mark(bool flag);
      bool bookmarked();
     
-     Book (string book)                                : book_name(book) , page(0) ,  marked(false)      { }
-     Book (string book , int page_)                    : book_name(book) , page(page_) , marked(false)   { }
-     Book (string book , int page_ , bool marked_)     : book_name(book) , page(page_) , marked(marked_) { }
+     Book ()                                           : book_name("")   , page(0)     ,  marked(false)      { }
+     Book (string book)                                : book_name(book) , page(0)     ,  marked(false)      { }
+     Book (string book , int page_)                    : book_name(book) , page(page_) , marked(false)       { }
+     Book (string book , int page_ , bool marked_)     : book_name(book) , page(page_) , marked(marked_)     { }
 
      friend istream& operator>>(istream& is , Book& book);
      friend ostream& operator<<(ostream& os , const Book& book);
@@ -47,10 +48,12 @@ class Book{
 
 istream& operator>>(istream& is , Book& book){
 
-    is.ignore(256,'\n');
+    is >> ws;
+    
     getline(is , book.book_name);
   
-    is >> ws >> book.page >> book.marked;
+    is >> book.page >> book.marked;
+    
     return is;
     
 }
@@ -85,7 +88,7 @@ void Book::set_page(int p){
 }
 
 
-int Book::get_page(){
+const int& Book::get_page() const{
 
      return page;
 
@@ -99,7 +102,7 @@ int Book::get_page(){
 }
 
 
-const string& Book::get_name() const{
+ string& Book::get_name() {
 
 
     return book_name;
@@ -129,11 +132,14 @@ class BookRack{
     
 
     public:
+            
+            BookRack(){empty = Book();}
 
             const vector<Book>& get_rack() const;
             void set_max(int max);
-            int get_max();
-
+            const int& get_max() const;
+            Book& get_entry(int entry);
+            
             void load_books(string file_name);
             void save_books(string file_name);
             void list_books();
@@ -144,13 +150,13 @@ class BookRack{
             void add_book(string book_name);
             void update_book(int entry , int page);
             void remove_book(int entry);
-
             void daily_update(int entry);
 
     private:
             int max_books;
             int book_count;
             vector<Book> book_container;
+            Book empty;
             
 
 
@@ -173,13 +179,26 @@ void BookRack::set_max(int max){
 
 }
 
-int BookRack::get_max(){
+
+const int& BookRack::get_max() const{
 
         return max_books;
 
 
 
 
+}
+
+
+ Book& BookRack::get_entry(int entry){
+  
+        if (entry < 1 || entry > book_count)
+              
+              return empty;
+  
+        return book_container[entry - 1];
+  
+  
 }
 
 
@@ -218,7 +237,7 @@ void BookRack::save_books(string file_name){
 
         for(Book& book : book_container ){
 
-                output_file << '\n' << book.get_name() << '\n' << book.get_page() << ' ' << book.bookmarked();
+                output_file << book.get_name() << '\n' << book.get_page() << ' ' << book.bookmarked() << '\n';
 
         }
         output_file.close();
@@ -244,7 +263,8 @@ void BookRack::list_books(){
 
 
 void BookRack::mark_unmark(int entry){
-     book_container[entry - 1].set_mark(!( book_container[entry - 1].bookmarked() ));
+     if(entry >= 1 && entry <= book_count)
+        get_entry(entry).set_mark(!( get_entry(entry).bookmarked() ));
 }
 
 
@@ -265,12 +285,14 @@ void BookRack::list_bookmarks(){
 
 void BookRack::add_book(string book_name){
 
-     for(Book book : book_container){
+     for(Book& book : book_container){
             if(book_name == book.get_name()){
                   return;
             }
      }
+     
      book_container.emplace_back(Book(book_name));
+     ++book_count;
 }
 
 
@@ -280,7 +302,7 @@ void BookRack::update_book(int entry, int page){
      if(entry < 1 || entry > book_count){
            return;
      }
-     book_container[entry - 1].set_page(page);
+     get_entry(entry).set_page(page);
 
 }
 
@@ -288,20 +310,10 @@ void BookRack::update_book(int entry, int page){
 
 void BookRack::remove_book(int entry){
 
-
-     
-     string temp;
-     
-
-     if(entry < 1 || entry  > book_count){
-              return;
-     }
-     
-     temp = book_container[entry - 1].get_name();
+     if(entry < 1 || entry  > book_count)
+        return;
      book_container.erase(book_container.begin() + entry - 1);
-
-     
-     cout << "\"" << temp << "\" removed\n";
+     --book_count;
 }
 
 void BookRack::daily_update(int entry){
@@ -309,12 +321,11 @@ void BookRack::daily_update(int entry){
     if(entry < 1 || entry > book_count){
             return;
     }
-    int page = book_container[entry - 1].get_page() + 20;
-    book_container[entry - 1].set_page(page);
-  
-  
+    int page = get_entry(entry).get_page() + 20;
+    get_entry(entry).set_page(page);
   
 }
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
@@ -333,22 +344,18 @@ int main(){
     
     
     
- 
     char choice = '0';
     string buffer;
     
+    
     while(true){
-         
-        BookRack rack;
-        rack.load_books("books.txt");
-        rack.set_max(500);
+      
+        BookRack rack; // load inside the loop so the file and the "rack" synchronize both ways
+        rack.load_books("books.txt"); rack.set_max(500);
         
-        
-        cout << "\x1b[H\x1b[2J";
-        
-        cout << "\nMenu:\n\n";
-        
-        
+        //cout << "\x1b[H\x1b[2J"; cout << "\nMenu:\n\n";
+        try{
+  
         cout << "f. Fill Daily Reading Target\n";
         cout << "l. Bookmarks List\n";
         cout << "x. Mark or Unmark A Book\n";
@@ -377,6 +384,8 @@ int main(){
                rack.save_books("books.txt");
                
                rack.list_books();
+               
+               cin.clear();
                getline(cin,buffer);
                break;
               
@@ -407,7 +416,9 @@ int main(){
                rack.save_books("books.txt");
                
                rack.list_bookmarks();
-              
+               
+               
+               cin.clear();
                getline(cin,buffer);
                break;
               
@@ -429,10 +440,12 @@ int main(){
                rack.list_books();
                
                cout << "Enter the name of the book you want to add: "; getline(cin,book_name);
+               
+               if(book_name == "") break;
                rack.add_book(book_name);
                rack.save_books("books.txt");
-               
                rack.list_books();
+               cout << "\"" << book_name << "\" added";
                break;
               
             }
@@ -443,12 +456,17 @@ int main(){
                  int entry; int page;
                  
                  rack.list_books();
-                 cout << "Enter book number to be updated: "; cin >> entry;
-                 cout << "Update \"" << rack.get_rack()[entry - 1].get_name() << "\" to page: "; cin >> page;
-                 rack.update_book(entry , page);
-                 rack.save_books("books.txt");
-                 rack.list_books();
+                 cout << "Enter book number to be updated: "; 
+                 if(cin >> entry && (rack.get_entry(entry).get_name() != "") ){
+                   cout << "Update \"" << rack.get_entry(entry).get_name() << "\" to page: ";
+                   if( cin >> page){
+                      rack.update_book(entry , page);
+                      rack.save_books("books.txt");
+                      rack.list_books();
+                   }
+                 }
                  
+                 cin.clear();
                  getline(cin,buffer);
                  break;
               
@@ -458,14 +476,22 @@ int main(){
             
             case 'r' :
             {
+              
                  int entry;
                 
-                 rack.list_books();
-                 cout << "Enter book number to be removed: "; cin >> entry;
-                 rack.remove_book(entry);
-                 rack.save_books("books.txt");
-                 rack.list_books();
+                 //rack.list_books();
+                 cout << "Enter book number to be removed: "; 
                  
+                 if(cin >> entry){
+                    rack.remove_book(entry);
+                   // rack.save_books("books.txt");
+                  //  rack.list_books();
+                    cout  << "\"" << rack.get_entry(entry).get_name() << "\" removed \n";
+                 
+                   
+                 }
+                 
+                 cin.clear();
                  getline(cin,buffer);
                  break;
               
@@ -481,12 +507,16 @@ int main(){
             
             default:
             
-            cout << "\ninvalid choice. please try again!\n";
+                 cout << "\ninvalid choice. please try again!\n";
               
         }
         
         getline(cin,buffer);
-        
+        }catch(...){
+          
+          
+          
+        }
     }
     
     return 0;
