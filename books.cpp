@@ -25,7 +25,7 @@ class Book{
      void set_mark(bool flag);
      bool bookmarked();
     
-     Book ()                                           : book_name("")   , page(0)     ,  marked(false)      { }
+     Book ()                                           : book_name(" ")   , page(0)     ,  marked(false)      { }
      Book (string book)                                : book_name(book) , page(0)     ,  marked(false)      { }
      Book (string book , int page_)                    : book_name(book) , page(page_) , marked(false)       { }
      Book (string book , int page_ , bool marked_)     : book_name(book) , page(page_) , marked(marked_)     { }
@@ -133,7 +133,6 @@ class BookRack{
 
     public:
             
-            BookRack(){empty = Book();}
 
             const vector<Book>& get_rack() const;
             void set_max(int max);
@@ -151,8 +150,11 @@ class BookRack{
             void update_book(int entry , int page);
             void remove_book(int entry);
             void daily_update(int entry);
+            
+            Book& get_empty();
 
     private:
+    
             int max_books;
             int book_count;
             vector<Book> book_container;
@@ -194,7 +196,7 @@ const int& BookRack::get_max() const{
   
         if (entry < 1 || entry > book_count)
               
-              return empty;
+              return get_empty();
   
         return book_container[entry - 1];
   
@@ -310,8 +312,9 @@ void BookRack::update_book(int entry, int page){
 
 void BookRack::remove_book(int entry){
 
-     if(entry < 1 || entry  > book_count)
+     if(entry - 1 < 0 || entry - 1  >= book_count)
         return;
+     
      book_container.erase(book_container.begin() + entry - 1);
      --book_count;
 }
@@ -324,6 +327,14 @@ void BookRack::daily_update(int entry){
     int page = get_entry(entry).get_page() + 20;
     get_entry(entry).set_page(page);
   
+}
+
+
+
+Book& BookRack::get_empty(){
+  
+  
+  return empty;
 }
 
 //------------------------------------------------------------------------------
@@ -457,7 +468,7 @@ int main(){
                  
                  rack.list_books();
                  cout << "Enter book number to be updated: "; 
-                 if(cin >> entry && (rack.get_entry(entry).get_name() != "") ){
+                 if(cin >> entry && (rack.get_entry(entry).get_name() != " ") ){
                    cout << "Update \"" << rack.get_entry(entry).get_name() << "\" to page: ";
                    if( cin >> page){
                       rack.update_book(entry , page);
@@ -479,14 +490,15 @@ int main(){
               
                  int entry;
                 
-                 //rack.list_books();
+                 rack.list_books();
                  cout << "Enter book number to be removed: "; 
                  
                  if(cin >> entry){
+                    string temp = rack.get_entry(entry).get_name();
                     rack.remove_book(entry);
-                   // rack.save_books("books.txt");
-                  //  rack.list_books();
-                    cout  << "\"" << rack.get_entry(entry).get_name() << "\" removed \n";
+                    rack.save_books("books.txt");
+                   rack.list_books();
+                    cout  << "\"" << temp << "\" removed \n";
                  
                    
                  }

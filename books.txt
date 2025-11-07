@@ -1,5 +1,3 @@
-How Linux works
-0 0
 Programming in C
 0 0
 A tour of C++
@@ -16,5 +14,3 @@ Introduction to Algorithms
 0 0
 The Algorithm Design Manual
 0 0
-Algoritma Dan Pemrograman Dalam Bahasa Pascal, C, Dan C++
-481 1
