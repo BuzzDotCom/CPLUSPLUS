@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 
 using namespace std;
@@ -16,14 +17,14 @@ class Book{
 
   public:
 
-     string& get_name() ;
+     const string& get_name() const;
 
      const int& get_page() const;
      void set_page(int p);
      
 
      void set_mark(bool flag);
-     bool bookmarked();
+     bool bookmarked() const;
     
      Book ()                                           : book_name("")   , page(0)     ,  marked(false)      { }
      Book (string book)                                : book_name(book) , page(0)     ,  marked(false)      { }
@@ -103,7 +104,7 @@ const int& Book::get_page() const{
 }
 
 
- string& Book::get_name() {
+ const string& Book::get_name() const {
 
 
     return book_name;
@@ -118,7 +119,7 @@ void Book::set_mark(bool flag){
 }
 
 
-bool Book::bookmarked(){
+bool Book::bookmarked() const{
 
     return marked;
 
@@ -171,7 +172,7 @@ class BookRack{
 
 
 
- vector<Book>& BookRack::get_rack() {
+vector<Book>& BookRack::get_rack(){
   
       return book_container;
   
@@ -197,7 +198,7 @@ const int& BookRack::get_max() const{
 }
 
 
- Book& BookRack::get_entry(int entry){
+Book& BookRack::get_entry(int entry){
   
         if (entry < 1 || entry > book_count)
               
@@ -259,8 +260,10 @@ void BookRack::list_books(){
 
         int entry = 1;
         for(Book& book : book_container){
-
-                cout << entry << ". " <<  book << "\n";
+                
+                cout << "-------- " << setfill('0') << setw(3) << entry << " --------\n";
+                cout << setfill(' ') << setw(0);
+                cout << book << "\n";
                 ++entry;
 
 
@@ -282,10 +285,12 @@ void BookRack::list_bookmarks(){
       int entry = 1;
       for(Book book : book_container){
             if(book.bookmarked()){
-
-                cout << entry << ". " <<  book << "\n";
-                ++entry;
+                
+                cout << "-------- " << setfill('0') << setw(3) << entry << " --------\n";
+                cout << setfill(' ') << setw(0);
+                cout <<  book << "\n";
             }
+            ++entry;
       }
 }
 
@@ -414,7 +419,9 @@ int main(){
             
             case 'l' :
             {
+               cout << "\n----- Bookmarks -----\n\n\n";
                rack.list_bookmarks();
+               cout << "\n---------------------\n\n";
                break;
               
             }
@@ -446,7 +453,9 @@ int main(){
             
             case 'b' :
             {
+               cout << "\n------- Books -------\n\n\n";
                rack.list_books();
+               cout << "\n---------------------\n\n";
                break;
               
             }

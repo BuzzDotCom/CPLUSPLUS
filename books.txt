@@ -5,7 +5,7 @@ How Linux works
 Programming in C
 0 0
 A tour of C++
-0 0 
+0 0
 Aplikasi Internet menggunakan HTML, CSS & JavaScript
 0 0
 Computer Networks
@@ -17,8 +17,8 @@ The Algorithm Design Manual
 Data Structures And Program Design in C++
 0 0
 Programming, Principles and Practice using C++
-780 1
+793 1
 Desain Digital & Arsitektur Komputer
 620 1
 Algoritma Dan Pemrograman Dalam Bahasa Pascal, C, Dan C++
-530 1
+532 1
