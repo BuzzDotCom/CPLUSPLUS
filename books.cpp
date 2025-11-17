@@ -72,7 +72,7 @@ ostream& operator<<(ostream& os , const Book& book){
     }
     
     os << "\"" << book.book_name << "\"" << endl;
-    os << "Page: " << book.page << endl;
+    os << "Page -> " << book.page << endl;
     return os;
 
 
@@ -377,20 +377,20 @@ int main(){
         BookRack rack{}; // load inside the loop so the file and the "rack" synchronize both ways
         rack.load_books("books.txt"); rack.set_max(500);
         
-        cout << "\x1b[H\x1b[2J"; cout << "\nMenu:\n\n";
+        cout << "\x1b[H\x1b[2J"; cout << "\n\n";
         //try{
   
-        cout << "f. Fill Daily Reading Target\n";
-        cout << "l. Bookmarks List\n";
-        cout << "x. Mark or Unmark A Book\n";
-        cout << "b. Books List\n";
-        cout << "a. Add A Book\n";
-        cout << "u. Update A Book\n";
-        cout << "r. Remove A Book\n";
-        cout << "q. Quit\n";
+        cout << "-> f. Fill Daily Reading Target\n";
+        cout << "-> l. Bookmarks List\n";
+        cout << "-> x. Mark or Unmark A Book\n";
+        cout << "-> b. Books List\n";
+        cout << "-> a. Add A Book\n";
+        cout << "-> u. Update A Book\n";
+        cout << "-> r. Remove A Book\n";
+        cout << "-> q. Quit\n";
         
         
-        cout << "\nEnter menu choice: "; cin >> choice; cout << '\n';
+        cout << "\n-> "; cin >> choice; cout << '\n';
         cin.ignore(256,'\n'); 
         
         
@@ -403,13 +403,13 @@ int main(){
                int entry;
               
                rack.list_bookmarks();
-               cout << "Enter book number to be updated: "; cin >> entry;
+               cout << "Enter book number to be updated -> "; cin >> entry;
                rack.daily_update(entry);
                rack.save_books("books.txt");
                
                rack.list_bookmarks();
                
-               cout << "Updated \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page();
+               cout << "Updated \"" << rack.get_entry(entry).get_name() << "\"\nto page -> " << rack.get_entry(entry).get_page();
                cin.clear();
                getline(cin,buffer);
                break;
@@ -436,7 +436,7 @@ int main(){
               
                rack.list_books();
                
-               cout << "Enter book number to be changed: "; cin >> entry;
+               cout << "Enter book number to be changed -> "; cin >> entry;
                
                rack.mark_unmark(entry);
                
@@ -468,7 +468,7 @@ int main(){
                
                rack.list_books();
                
-               cout << "Enter the name of the book you want to add: "; getline(cin,book_name);
+               cout << "Enter the name of the book you want to add -> "; getline(cin,book_name);
                
                if(book_name == "") break;
                rack.add_book(book_name);
@@ -485,14 +485,14 @@ int main(){
                  int entry; int page;
                  
                  rack.list_books();
-                 cout << "Enter book number to be updated: "; 
+                 cout << "Enter book number to be updated -> "; 
                  if(cin >> entry && (rack.get_entry(entry).get_name() != "") ){
-                   cout << "Update \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page() << " + ";
+                   cout << "Update \"" << rack.get_entry(entry).get_name() << "\"\nto page -> " << rack.get_entry(entry).get_page() << " + ";
                    if( cin >> page){
                       rack.update_book(entry , page);
                       rack.save_books("books.txt");
                       rack.list_books();
-                      cout << "Updated \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page();
+                      cout << "Updated \"" << rack.get_entry(entry).get_name() << "\"\nto page -> " << rack.get_entry(entry).get_page();
                       getline(cin,buffer);
                       break;
                    }
@@ -513,7 +513,7 @@ int main(){
                  int entry;
                 
                  rack.list_books();
-                 cout << "Enter book number to be removed: "; 
+                 cout << "Enter book number to be removed -> "; 
                  
                  if(cin >> entry){
                     string temp = rack.get_entry(entry).get_name();
