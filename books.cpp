@@ -212,11 +212,11 @@ Book& BookRack::get_entry(int entry){
 
 void BookRack::load_books(string file_name){
 
-        ifstream input_file;
-        input_file.open(file_name);
+        ifstream input_file{file_name};
+        //input_file.open(file_name);
 
         
-        if(!input_file.is_open()){
+        if(!input_file){
             cerr << "error\n";
             return;
 
@@ -229,16 +229,16 @@ void BookRack::load_books(string file_name){
              ++book_count;
              //cout << book_count << "\n"; // for debug
         }
-        input_file.close();
+        //input_file.close();
 }
 
 
 void BookRack::save_books(string file_name){
 
-        ofstream output_file;
-        output_file.open(file_name);
+        ofstream output_file{file_name};
+        //output_file.open(file_name);
 
-        if(!output_file.is_open()){
+        if(!output_file){
              
             cerr << "error\n";
             return;
@@ -250,14 +250,15 @@ void BookRack::save_books(string file_name){
                 output_file << book.get_name() << '\n' << book.get_page() << ' ' << book.bookmarked() << '\n';
 
         }
-        output_file.close();
+        //output_file.close();
 
 }
 
 
 
 void BookRack::list_books(){
-
+  
+        cout << "\n\n------- Books -------\n\n\n";
         int entry = 1;
         for(Book& book : book_container){
                 
@@ -265,23 +266,24 @@ void BookRack::list_books(){
                 cout << setfill(' ') << setw(0);
                 cout << book << "\n";
                 ++entry;
-
-
         }
-
+        cout << "\n---------------------\n\n";
 }
 
 
 
 
 void BookRack::mark_unmark(int entry){
-     if(entry >= 1 && entry <= book_count)
-        get_entry(entry).set_mark(!( get_entry(entry).bookmarked() ));
+         
+      if(get_entry(entry).get_name() == "")
+         return;
+      get_entry(entry).set_mark(!( get_entry(entry).bookmarked() ));
 }
 
 
 void BookRack::list_bookmarks(){
 
+      cout << "\n\n----- Bookmarks -----\n\n\n";
       int entry = 1;
       for(Book book : book_container){
             if(book.bookmarked()){
@@ -292,6 +294,7 @@ void BookRack::list_bookmarks(){
             }
             ++entry;
       }
+      cout << "\n---------------------\n\n";
 }
 
 
@@ -313,30 +316,27 @@ void BookRack::add_book(string book_name){
 
 void BookRack::update_book(int entry, int page){
   
-     if(entry < 1 || entry > book_count){
-           return;
-     }
-     get_entry(entry).set_page(page);
+    
+     if(get_entry(entry).get_name() == "")
+         return;
+     get_entry(entry).set_page(page + get_entry(entry).get_page());
 
 }
 
 
 
 void BookRack::remove_book(int entry){
-
-     if(entry - 1 < 0 || entry - 1  > book_count - 1)
-        
-        return;
-     
+  
+     if(get_entry(entry).get_name() == "")
+         return;
      book_container.erase(book_container.begin() + entry - 1);
      --book_count;
 }
 
 void BookRack::daily_update(int entry){
   
-    if(entry < 1 || entry > book_count){
-            return;
-    }
+    if(get_entry(entry).get_name() == "")
+         return;
     int page = get_entry(entry).get_page() + 20;
     get_entry(entry).set_page(page);
   
@@ -407,8 +407,9 @@ int main(){
                rack.daily_update(entry);
                rack.save_books("books.txt");
                
-               rack.list_books();
+               rack.list_bookmarks();
                
+               cout << "Updated \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page();
                cin.clear();
                getline(cin,buffer);
                break;
@@ -419,9 +420,9 @@ int main(){
             
             case 'l' :
             {
-               cout << "\n----- Bookmarks -----\n\n\n";
+               
                rack.list_bookmarks();
-               cout << "\n---------------------\n\n";
+               
                break;
               
             }
@@ -443,7 +444,7 @@ int main(){
                
                rack.list_bookmarks();
                
-               
+               cout << "Updated \"" << rack.get_entry(entry).get_name() << "\"";
                cin.clear();
                getline(cin,buffer);
                break;
@@ -453,9 +454,9 @@ int main(){
             
             case 'b' :
             {
-               cout << "\n------- Books -------\n\n\n";
+               
                rack.list_books();
-               cout << "\n---------------------\n\n";
+               
                break;
               
             }
@@ -486,14 +487,18 @@ int main(){
                  rack.list_books();
                  cout << "Enter book number to be updated: "; 
                  if(cin >> entry && (rack.get_entry(entry).get_name() != "") ){
-                   cout << "Update \"" << rack.get_entry(entry).get_name() << "\" to page: ";
+                   cout << "Update \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page() << " + ";
                    if( cin >> page){
                       rack.update_book(entry , page);
                       rack.save_books("books.txt");
                       rack.list_books();
+                      cout << "Updated \"" << rack.get_entry(entry).get_name() << "\" to page: " << rack.get_entry(entry).get_page();
+                      getline(cin,buffer);
+                      break;
                    }
                  }
                  
+                 rack.list_books();
                  cin.clear();
                  getline(cin,buffer);
                  break;
@@ -516,10 +521,12 @@ int main(){
                     rack.save_books("books.txt");
                     rack.list_books();
                     cout  << "\"" << temp << "\" removed \n";
-                 
+                    getline(cin,buffer);
+                    break;
                    
                  }
                  
+                 rack.list_books();
                  cin.clear();
                  getline(cin,buffer);
                  break;
